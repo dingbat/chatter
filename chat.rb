@@ -6,8 +6,7 @@ connections = []
 chats = {}
 
 get '/' do
-  halt erb(:login) unless params[:user]
-  erb :chat, :locals => { :user => params[:user].gsub(/\W/, '') }
+  erb :chat
 end
 
 get '/stream', :provides => 'text/event-stream' do
@@ -53,18 +52,11 @@ __END__
     <meta charset="utf-8" />
     <script src="jquery-1.9.1.js"></script>
     <script src="jquery-ui.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="jquery-ui.css"/>
     <link rel="stylesheet" type="text/css" href="style.css" />
     </head>
   <body><%= yield %></body>
 </html>
-
-@@ login
-<form action='/'>
-  <label for='user'>User Name:</label>
-  <input name='user' value='' />
-  <input type='submit' value="GO!" />
-</form>
 
 @@ chat
 
@@ -78,6 +70,12 @@ __END__
   <a href="#" onclick="makeBox('pad')">new pad</a>
   <br>
   <a href="#" onclick="makeBox('board')">new board</a>
+  
+  <br><br><br>
+  <b>username:</b>
+  <div>
+  <input id="user" placeholder="anon" />
+  </div>
   </div>
 </section>
 
@@ -104,6 +102,68 @@ __END__
     }
   }, false);
   
+  function chatCode(name)
+  {
+    var a = "<pre id='chat-"+name+"' class='chatbox'></pre> \
+    <form id='form-"+name+"'><input id='msg-"+name+"' placeholder='type message here...' /></form>";
+    return a;
+  }
+  
+  function buildChatWindow(name)
+  {
+    var a = chatCode(name);
+    makeWindow('window-'+name, name+' room',a);
+    connectToRoom(name);
+  }
+  
+  function newWindow(type, btn)
+  {
+    var name = $(btn).parent().find('#namefield').val();
+    
+    var wind = $(btn).parent().parent().parent().parent();
+    wind.attr('id', 'window-'+name);
+    
+    wind.find(".title").html(name+" "+type);
+    
+    if (type == "room")
+    {
+      var a = chatCode(name);
+      wind.find(".content").html(a);
+      
+      connectToRoom(name);
+    }
+  }
+  
+  function makeWindow(id, title, content)
+  {
+    var a = "<div id='"+id+"' class='window' style='height: 200px'> \
+      <div class='titlebar'><div class='title'>"+title+"</div><div class='kill'>x</div></div> \
+      <div class='content'> \
+      "+content+" \
+      </div> \
+    </div> \
+    ";
+    
+    $('#windows').append(a);
+    
+    $('#'+id).draggable({ containment: "parent" });
+    $('#'+id).resizable();
+  }
+  
+  function makeBox(type)
+  {
+    var a = "<div class='newtext'> \
+    <div class='newcontent'> \
+        name your new "+type+":<br> \
+        <input id='namefield' /> \
+        <button id='temp-btn' onclick='newWindow(\""+type+"\", this)'>go!</button> \
+    </div> \
+    </div>";
+    
+    makeWindow('temp-win', 'new '+type, a);
+    $('#temp-win').attr('id', '');
+  }
+  
   function getPosition(e) {
 
       //this section is from http://www.quirksmode.org/js/events_properties.html
@@ -126,23 +186,8 @@ __END__
       return {"x": x, "y": y};
   }
 
-  function newRoom(name)
+  function connectToRoom(name)
   {
-    var a = "<div id='window-"+name+"' class='window'> \
-      <div class='titlebar'><div class='title'>chatroom</div><div class='kill'>x</div></div> \
-      <div class='content'> \
-        <pre id='chat-"+name+"' class='chatbox'></pre> \
-        <form id='form-"+name+"'><input id='msg-"+name+"' placeholder='type message here...' /></form> \
-      </div> \
-    </div> \
-    ";
-    
-    $('#windows').append(a);
-    
-    $('#window-'+name).draggable();
-    $('#window-'+name).resizable();
-    
-    console.log("add listener for chat-"+name);
     source.addEventListener('chat-'+name, function(e) 
     {
       var dat = e.data.split("\n"); 
@@ -157,7 +202,12 @@ __END__
     $('#form-'+name).on('submit',function(e) {
       var msgBox = $('#msg-'+name);
 
-      $.post('/chat', {name: name, msg: msgBox.val(), user: "<%= user %>"});
+      var user = $('#user').val();
+      if (user.length == 0)
+      {
+        user = "anon";
+      }
+      $.post('/chat', {name: name, msg: msgBox.val(), user: user});
       msgBox.val('');
       msgBox.focus();
       e.preventDefault();
@@ -269,5 +319,6 @@ __END__
       e.preventDefault();
     });
   }
-  newRoom("room");
+  
+  buildChatWindow('chatter');
 </script>
