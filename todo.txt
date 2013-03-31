@@ -1,3 +1,4 @@
 - duplicate rooms (same names).
+- duplicate usernames.
 
 - server

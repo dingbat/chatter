@@ -51,7 +51,7 @@ a:visited {color:#000000;}
   margin: 0px;
   border: 1px solid black;
 	height:150px;
-	min-height:60px;
+	min-height:80px;
 	padding-bottom:29px;
 	z-index:999;
 }
@@ -99,7 +99,10 @@ a:visited {color:#000000;}
 {
 	position:relative;
 	padding-left:4px;
-	bottom:-3px
+	padding-right:4px;
+	bottom:-3px;
+	height:26px;
+	width:392px;
 }
 
 .window .content

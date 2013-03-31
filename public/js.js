@@ -29,7 +29,7 @@ return a;
 
 function boardCode(name)
 {
-var a = "<canvas style='border-bottom: 1px solid black; background-color:white;' id='board-"+name+"' width='400' height='250'></canvas><div class='toolbar'><button onclick='clearBoard(\""+name+"\")'>clear</button></div>";
+var a = "<canvas style='border-bottom: 1px solid black; background-color:white;' id='board-"+name+"' width='400' height='250'></canvas><div class='toolbar handler'><button onclick='clearBoard(\""+name+"\")'>clear</button></div>";
 return a;
 }
 
@@ -100,7 +100,7 @@ function makeWindow(id, title, content, board)
 	
 	var x = totalWindows*15;
 var a = "<div id='"+id+"' class='window' style='left:"+x+"px; top:"+x+"px; "+(board ? "width: 400px; height: 280px" : "width: 250px")+"'> \
-  <div class='titlebar'><div class='title'>"+title+"</div><div class='kill'><a href='#' style='text-decoration:none' onclick='killWindow(this)'>x</a></div></div> \
+  <div class='titlebar handler'><div class='title'>"+title+"</div><div class='kill'><a href='#' style='text-decoration:none' onclick='killWindow(this)'>x</a></div></div> \
   <div class='content'> \
   "+content+" \
   </div> \
@@ -116,7 +116,7 @@ if (!board)
 }
 else
 {
-  $('#'+id).draggable({ cursor: "move", stack: "#windows div", scroll:false, containment: "parent", handle: "div.titlebar"});
+  $('#'+id).draggable({ cursor: "move", stack: "#windows div", scroll:false, containment: "parent", handle: ".handler"});
 }
 }
 
@@ -168,8 +168,13 @@ source.addEventListener('chat-'+name, function(e)
   
   var dat = e.data.split("\n"); 
   var user = dat[0];
+	var disp = "<b>"+user+"</b>: ";
   var msg = dat[1];
-  $('#chat-'+name).append("<b>" + user + "</b>: "+msg+"\n");
+	if (user == $('#user').val())
+	{
+		disp = "<span style='color:blue'>"+disp+"</span>";
+	}
+  $('#chat-'+name).append(disp+msg+"\n");
 
   console.log("being chatted at by "+user);
 
