@@ -3,7 +3,10 @@
 require 'sinatra'
 set :server, 'thin'
 connections = []
+
 chats = {}
+boards = {}
+pads = {}
 
 get '/' do
   erb :chat
@@ -17,7 +20,16 @@ get '/stream', :provides => 'text/event-stream' do
 end
 
 get '/chat' do
-  chats[params[:name]]
+  chats[params[:name]] || ""
+end
+
+get '/board' do
+  puts "sending "+ (boards[params[:name]] || "")
+  boards[params[:name]] || ""
+end
+
+get '/pad' do
+  pads[params[:name]] || ""
 end
 
 post '/chat' do
@@ -34,12 +46,33 @@ post '/chat' do
 end
 
 post '/pad' do
-  connections.each { |out| out << "event: pad-#{params[:name]}\ndata: #{params[:msg]}\n\n" }
+  name = params[:name]
+  msg = params[:msg]
+
+  pads[name] = msg
+
+  connections.each { |out| out << "event: pad-#{name}\ndata: #{msg}\n\n" }
   204 # response without entity body
 end
 
 post '/board' do
-  connections.each { |out| out << "event: board-#{params[:name]}\ndata: #{params[:msg]}\n\n" }
+  name = params[:name]
+  msg = params[:msg]
+  
+  puts "adding #{msg} to baords[#{name}]"
+  
+  if msg
+    if msg == "clear"
+      boards[name] = ""
+    else
+      boards[name] ||= ""
+      boards[name] += msg
+    end
+  end
+  
+ # puts "boards[#{name}] = #{boards[name]}"
+  
+  connections.each { |out| out << "event: board-#{name}\ndata: #{msg}\n\n" }
   204 # response without entity body
 end
 

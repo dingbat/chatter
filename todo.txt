@@ -1,6 +1,7 @@
 - duplicate rooms (same names).
 - duplicate usernames.
 
--toolbar is a little strange (and clr button is only half active)
+- toolbar is a little strange (and clr button is only half active)
+- escape stuff! so much direct HTML insertion...
 
 - server

@@ -36,29 +36,26 @@ return a;
 function buildChatWindow(name)
 {
 var a = chatCode(name);
-makeWindow('window-'+name, name+' room',a, false);
+makeWindow('window-room-'+name, name+' room',a, false);
 connectToRoom(name);
 }
 
 function buildPadWindow(name)
 {
 var a = padCode(name);
-makeWindow('window-'+name, name+' pad',a, false);
+makeWindow('window-pad-'+name, name+' pad',a, false);
 connectToPad(name);
 }
 
 function buildBoardWindow(name)
 {
 var a = boardCode(name);
-makeWindow('window-'+name, name+' board',a, true);
+makeWindow('window-board-'+name, name+' board',a, true);
 connectToBoard(name);
 }
 
-function newWindow(type, btn)
+function newWindow(type, wind, name)
 {
-var name = $(btn).parent().find('#namefield').val();
-
-var wind = $(btn).parent().parent().parent().parent();
 wind.attr('id', 'window-'+type+'-'+name);
 
 wind.find(".title").html(name+" "+type);
@@ -120,17 +117,27 @@ else
 }
 }
 
+function something(type, form)
+{
+	var name = $(form).find('#namefield').val();
+	var wind = $(form).parents(".window");
+	newWindow(type, wind, name);
+}
+
 function makeBox(type)
 {
 var a = "<div class='newtext'> \
 <div class='newcontent'> \
+	<form action='javascript:;' onsubmit='something(\""+type+"\", this)'> \
     create/join "+type+":<br> \
     <input id='namefield' placeholder='"+type+" name' /><br> \
-    <button id='temp-btn' onclick='newWindow(\""+type+"\", this)'>go!</button> \
+    <button id='temp-btn'>go!</button> \
+	</form> \
 </div> \
 </div>";
 
 makeWindow('temp-win', 'new '+type, a, type=="board");
+$('#temp-win').find('#namefield').focus();
 $('#temp-win').attr('id', '');
 }
 
@@ -175,8 +182,6 @@ source.addEventListener('chat-'+name, function(e)
 		disp = "<span style='color:blue'>"+disp+"</span>";
 	}
   $('#chat-'+name).append(disp+msg+"\n");
-
-  console.log("being chatted at by "+user);
 
 }, false);
 
@@ -230,11 +235,56 @@ obj.keyup(function(e) {
 
   e.preventDefault();
 });
+
+$.get('/pad?name='+name, function(data)
+{
+	$('#pad-'+name).val(data);
+});
 }
 
 function clearBoard(name)
 {
 $.post('/board', {name: name, msg: "clear"});
+}
+
+function drawBoardData(ctx, data)
+{
+	var chunks = data.split("|");
+	for (a = 0; a < chunks.length; a++)
+	{
+		var chunk = chunks[a];
+		if (chunk.length == 0 || !chunk)
+		{
+			break;
+		}
+		var dat = chunk.split("x");
+		  var started = false;
+		  for (i=0; i < dat.length; i++)
+		  {
+		    var pts = dat[i].split(",");
+		    var x = parseInt(pts[0]);
+		    var y = parseInt(pts[1]);
+		    if (!started)
+		    {
+		      started = true;
+		      ctx.moveTo(x,y);
+		    }
+		    else
+		    {
+		      ctx.lineTo(x,y);
+		    }
+		  }
+		  ctx.stroke();
+	}
+}
+
+function sendBoardData(name)
+{
+	if (boards[name])
+	{
+		isDragging = false;
+	  	$.post('/board', {name: name, msg: boards[name]+"|"});
+	}
 }
 
 function connectToBoard(name)
@@ -244,6 +294,14 @@ var ctx = document.getElementById('board-'+name).getContext("2d");
 ctx.lineWidth = 5;
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
+
+$.get('/board?name='+name, function(data)
+{
+	if (data.length > 0)
+	{
+		drawBoardData(ctx, data); 
+	}
+});
 
 source.addEventListener('board-'+name, function(e) 
 {
@@ -258,38 +316,17 @@ source.addEventListener('board-'+name, function(e)
     ctx.beginPath();
     return;
   }
-  
-  var dat = e.data.split("x");
-  var started = false;
-  for (i=0; i < dat.length; i++)
-  {
-    var pts = dat[i].split(",");
-    var x = parseFloat(pts[0]);
-    var y = parseFloat(pts[1]);
-    if (!started)
-    {
-      started = true;
-      ctx.moveTo(x,y);
-    }
-    else
-    {
-      ctx.lineTo(x,y);
-    }
-  }
-  ctx.stroke();
+
+  drawBoardData(ctx, e.data);
 }, false);
 
 obj.mouseup(function(e) {
-  isDragging = false;
-
-  $.post('/board', {name: name, msg: boards[name]});
+	sendBoardData(name);
   e.preventDefault();
 });
 
 obj.mouseout(function(e) {
-  isDragging = false;
-
-  $.post('/board', {name: name, msg: boards[name]});
+	sendBoardData(name);
   e.preventDefault();
 });
 
@@ -318,3 +355,5 @@ obj.mousemove(function(e) {
 }
 
 buildChatWindow('chatter');
+//make the first window on bottom? seems to come up for some reason
+//$('#window-room-chatter').attr('z-index', undefined);

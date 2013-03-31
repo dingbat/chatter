@@ -110,7 +110,8 @@ a:visited {color:#000000;}
 	margin-top:1px;
 	height:100%;
 	width:100%;
-	overflow: scroll;
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 .chatbox
