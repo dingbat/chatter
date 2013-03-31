@@ -52,7 +52,6 @@ __END__
     <meta charset="utf-8" />
     <script src="jquery-1.9.1.js"></script>
     <script src="jquery-ui.js"></script>
-    <!-- http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/ -->
     <link rel="stylesheet" type="text/css" href="jquery-ui.css"/>
     <link rel="stylesheet" type="text/css" href="style.css" />
     </head>
