@@ -109,11 +109,37 @@ __END__
     return a;
   }
   
+  function padCode(name)
+  {
+    var a = "<textarea id='pad-"+name+"' />";
+    return a;
+  }
+  
+  function boardCode(name)
+  {
+    var a = "<canvas style='border: 1px solid black; background-color:white;' id='board-"+name+"' width='400' height='250'></canvas><button onclick='clearBoard(\""+name+"\")'>clr</button>";
+    return a;
+  }
+  
   function buildChatWindow(name)
   {
     var a = chatCode(name);
-    makeWindow('window-'+name, name+' room',a);
+    makeWindow('window-'+name, name+' room',a, false);
     connectToRoom(name);
+  }
+  
+  function buildPadWindow(name)
+  {
+    var a = padCode(name);
+    makeWindow('window-'+name, name+' pad',a, false);
+    connectToPad(name);
+  }
+  
+  function buildBoardWindow(name)
+  {
+    var a = boardCode(name);
+    makeWindow('window-'+name, name+' board',a, true);
+    connectToBoard(name);
   }
   
   function newWindow(type, btn)
@@ -132,11 +158,27 @@ __END__
       
       connectToRoom(name);
     }
+    
+    if (type == "pad")
+    {
+      var a = padCode(name);
+      wind.find(".content").html(a);
+      
+      connectToPad(name);
+    }
+    
+    if (type == "board")
+    {
+      var a = boardCode(name);
+      wind.find(".content").html(a);
+      
+      connectToBoard(name);
+    }
   }
   
-  function makeWindow(id, title, content)
+  function makeWindow(id, title, content, board)
   {
-    var a = "<div id='"+id+"' class='window' style='height: 200px'> \
+    var a = "<div id='"+id+"' class='window' style='width:"+(board ? "430px" : "250px")+"'> \
       <div class='titlebar'><div class='title'>"+title+"</div><div class='kill'>x</div></div> \
       <div class='content'> \
       "+content+" \
@@ -146,8 +188,15 @@ __END__
     
     $('#windows').append(a);
     
-    $('#'+id).draggable({ containment: "parent" });
-    $('#'+id).resizable();
+    if (!board)
+    {
+      $('#'+id).draggable({ cursor: "move", stack: "#windows div", scroll:false, containment: "parent"});
+      $('#'+id).resizable();
+    }
+    else
+    {
+      $('#'+id).draggable({ cursor: "move", stack: "#windows div", scroll:false, containment: "parent", handle: "div.titlebar"});
+    }
   }
   
   function makeBox(type)
@@ -160,7 +209,7 @@ __END__
     </div> \
     </div>";
     
-    makeWindow('temp-win', 'new '+type, a);
+    makeWindow('temp-win', 'new '+type, a, type=="board");
     $('#temp-win').attr('id', '');
   }
   
@@ -219,10 +268,8 @@ __END__
     });
   }
   
-  function newPad(name)
+  function connectToPad(name)
   {
-    $('#pads').append("<textarea id='pad-"+name+"' />");
-    
     source.addEventListener('pad-'+name, function(e) 
     {
       var dat = e.data;
@@ -250,10 +297,8 @@ __END__
     $.post('/board', {name: name, msg: "clear"});
   }
   
-  function newWhiteboard(name)
+  function connectToBoard(name)
   {
-    $('#boards').append("<canvas style='border: 1px solid black;' id='board-"+name+"' width='400' height='250'></canvas><button onclick='clearBoard(\""+name+"\")'>clr</button>");
-		
 		var obj = $('#board-'+name);
     var ctx = document.getElementById('board-'+name).getContext("2d");
     ctx.lineWidth = 5;
@@ -320,5 +365,7 @@ __END__
     });
   }
   
+  buildPadWindow('padder');
   buildChatWindow('chatter');
+  buildBoardWindow('board');
 </script>
