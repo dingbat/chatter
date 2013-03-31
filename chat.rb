@@ -61,7 +61,7 @@ __END__
 @@ chat
 
 <section class="sidebar">
-  <div class="inset">
+  <div class="insetside">
     <h1>chatter</h1>
     
     <br>
@@ -83,13 +83,11 @@ __END__
     <br>
     <b>username:</b><br>
     <input id="user" placeholder="anon" />
-    </div>
+  </div>
 </section>
 
 <section class="main">
-  <div class="inset">
-    <div id="windows">
-    </div>
+  <div id="windows">
   </div>
 </section>
 

@@ -2,6 +2,7 @@ padTimeouts = {};
 boardTimeouts = {};
 boards = {};
 isDragging = false;
+totalWindows = 0;
 
 source = new EventSource('/stream');
 
@@ -95,7 +96,10 @@ win.remove();
 
 function makeWindow(id, title, content, board)
 {
-var a = "<div id='"+id+"' class='window' "+(board ? "style='width: 400px; height: 280px'" : "style='width: 250px'")+"> \
+	totalWindows++;
+	
+	var x = totalWindows*15;
+var a = "<div id='"+id+"' class='window' style='left:"+x+"px; top:"+x+"px; "+(board ? "width: 400px; height: 280px" : "width: 250px")+"'> \
   <div class='titlebar'><div class='title'>"+title+"</div><div class='kill'><a href='#' style='text-decoration:none' onclick='killWindow(this)'>x</a></div></div> \
   <div class='content'> \
   "+content+" \
@@ -120,8 +124,8 @@ function makeBox(type)
 {
 var a = "<div class='newtext'> \
 <div class='newcontent'> \
-    name your new "+type+":<br> \
-    <input id='namefield' /> \
+    create/join "+type+":<br> \
+    <input id='namefield' placeholder='"+type+" name' /><br> \
     <button id='temp-btn' onclick='newWindow(\""+type+"\", this)'>go!</button> \
 </div> \
 </div>";
@@ -182,6 +186,8 @@ $('#form-'+name).on('submit',function(e) {
   $.post('/chat', {name: name, msg: msgBox.val(), user: user});
   msgBox.val('');
   msgBox.focus();
+	var scrolly = msgBox.parent().parent().parent();
+	scrolly.scrollTop(scrolly[0].scrollHeight);
   e.preventDefault();
 });
 
@@ -300,4 +306,3 @@ obj.mousemove(function(e) {
 }
 
 buildChatWindow('chatter');
-buildPadWindow('padder');
