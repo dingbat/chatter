@@ -1,4 +1,6 @@
 - duplicate rooms (same names).
 - duplicate usernames.
 
+-toolbar is a little strange (and clr button is only half active)
+
 - server

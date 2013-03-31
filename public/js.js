@@ -286,6 +286,13 @@ obj.mouseup(function(e) {
   e.preventDefault();
 });
 
+obj.mouseout(function(e) {
+  isDragging = false;
+
+  $.post('/board', {name: name, msg: boards[name]});
+  e.preventDefault();
+});
+
 obj.mousedown(function(e) {
   isDragging = true;
   pos = getPosition(e);
