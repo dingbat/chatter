@@ -106,14 +106,11 @@ var a = "<div id='"+id+"' class='window' style='left:"+x+"px; top:"+x+"px; "+(bo
 
 $('#windows').append(a);
 
+$('#'+id).draggable({ cursor: "move", stack: "#windows div", scroll:false, containment: "parent", handle: ".handler"});
+
 if (!board)
 {
-  $('#'+id).draggable({ cursor: "move", stack: "#windows div", scroll:false, containment: "parent"});
   $('#'+id).resizable();
-}
-else
-{
-  $('#'+id).draggable({ cursor: "move", stack: "#windows div", scroll:false, containment: "parent", handle: ".handler"});
 }
 }
 
