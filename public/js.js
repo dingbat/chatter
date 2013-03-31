@@ -15,20 +15,20 @@ if (e.eventPhase == EventSource.CLOSED) {
 
 function chatCode(name)
 {
-var a = "<pre id='chat-"+name+"' class='chatbox'></pre> \
-<form id='form-"+name+"'><input id='msg-"+name+"' placeholder='type message here...' /></form>";
+var a = "<div class='chatbox'><pre id='chat-"+name+"'></pre> \
+<form id='form-"+name+"'><input id='msg-"+name+"' placeholder='type message here...' /></form></div>";
 return a;
 }
 
 function padCode(name)
 {
-var a = "<textarea id='pad-"+name+"' />";
+var a = "<textarea id='pad-"+name+"' style='width:100%; height:100%; resize: none; border: none;' />";
 return a;
 }
 
 function boardCode(name)
 {
-var a = "<canvas style='border: 1px solid black; background-color:white;' id='board-"+name+"' width='400' height='250'></canvas><button onclick='clearBoard(\""+name+"\")'>clr</button>";
+var a = "<canvas style='border-bottom: 1px solid black; background-color:white;' id='board-"+name+"' width='400' height='250'></canvas><div class='toolbar'><button onclick='clearBoard(\""+name+"\")'>clear</button></div>";
 return a;
 }
 
@@ -95,7 +95,7 @@ win.remove();
 
 function makeWindow(id, title, content, board)
 {
-var a = "<div id='"+id+"' class='window' style='width:"+(board ? "430px" : "250px")+"'> \
+var a = "<div id='"+id+"' class='window' "+(board ? "style='width: 400px; height: 280px'" : "style='width: 250px'")+"> \
   <div class='titlebar'><div class='title'>"+title+"</div><div class='kill'><a href='#' style='text-decoration:none' onclick='killWindow(this)'>x</a></div></div> \
   <div class='content'> \
   "+content+" \
@@ -300,3 +300,4 @@ obj.mousemove(function(e) {
 }
 
 buildChatWindow('chatter');
+buildPadWindow('padder');

@@ -31,15 +31,19 @@ a:visited {color:#000000;}
 
 .window {
   background: #FCFCFC;
-  width: 350px;
+  min-width: 250px;
   margin: 0px;
   border: 1px solid black;
+	height:150px;
+	min-height:60px;
+	padding-bottom:29px;
+	
 }
 
 .window .titlebar
 {
 	background-color:#F3F3F3;
-  width: 100%;
+  width: auto;
   margin: -1px;
   height: 28px;
   border: 1px solid black;
@@ -62,10 +66,9 @@ a:visited {color:#000000;}
 
 .newtext
 {
-	width: 100%;
+	width: auto;
 	display:table;
 	text-align:center;
-	height: 150px;
 }
 
 .window .titlebar .kill
@@ -75,16 +78,25 @@ a:visited {color:#000000;}
   padding-right:10px;
 }
 
+.toolbar
+{
+	position:relative;
+	padding-left:4px;
+	bottom:-3px
+}
+
 .window .content
 {
-	overflow: scroll;
-	height: auto;
-	
-  padding:10px;
+	margin-top:1px;
+	height:100%;
+	width:100%;
 }
 
 .chatbox
 {
+	padding-left:10px;
+	padding-right:10px;
+	
 	height: auto;
 	overflow: scroll;
 }
