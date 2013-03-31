@@ -17,7 +17,7 @@ if (e.eventPhase == EventSource.CLOSED) {
 function chatCode(name)
 {
 var a = "<div class='chatbox'><pre id='chat-"+name+"'></pre> \
-<form id='form-"+name+"'><input id='msg-"+name+"' placeholder='type message here...' /></form></div>";
+<form action='javascript:;' id='form-"+name+"'><input size='40' id='msg-"+name+"' autocomplete='off' placeholder='type message here...' /></form></div>";
 return a;
 }
 
@@ -87,7 +87,7 @@ if (type == "board")
 
 function killWindow(x)
 {
-var win = $(x).parent().parent().parent();
+var win = $(x).parents(".window");
 win.remove();
 }
 
@@ -114,18 +114,26 @@ if (!board)
 }
 }
 
-function something(type, form)
+function joinWindow(type, form)
 {
 	var name = $(form).find('#namefield').val();
 	var wind = $(form).parents(".window");
-	newWindow(type, wind, name);
+	
+	if ($('#window-'+type+"-"+name).length > 0)
+	{
+		wind.find('.newcontent').append("<div class='dupealert'>"+name+" "+type+" is already open.</div>");
+	}
+	else
+	{
+		newWindow(type, wind, name);
+	}
 }
 
 function makeBox(type)
 {
 var a = "<div class='newtext'> \
 <div class='newcontent'> \
-	<form action='javascript:;' onsubmit='something(\""+type+"\", this)'> \
+	<form action='javascript:;' onsubmit='joinWindow(\""+type+"\", this)'> \
     create/join "+type+":<br> \
     <input id='namefield' placeholder='"+type+" name' /><br> \
     <button id='temp-btn'>go!</button> \
@@ -184,6 +192,8 @@ source.addEventListener('chat-'+name, function(e)
 
 $('#form-'+name).on('submit',function(e) {
   var msgBox = $('#msg-'+name);
+	if (msgBox.val().length == 0)
+		return;
 
   var user = $('#user').val();
   if (user.length == 0)
@@ -193,7 +203,7 @@ $('#form-'+name).on('submit',function(e) {
   $.post('/chat', {name: name, msg: msgBox.val(), user: user});
   msgBox.val('');
   msgBox.focus();
-	var scrolly = msgBox.parent().parent().parent();
+	var scrolly = msgBox.parent(".content");
 	scrolly.scrollTop(scrolly[0].scrollHeight);
   e.preventDefault();
 });

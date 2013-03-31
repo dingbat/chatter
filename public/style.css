@@ -95,6 +95,12 @@ a:visited {color:#000000;}
   padding-right:10px;
 }
 
+.dupealert
+{
+	color:red;
+	font-size:14px;
+}
+
 .toolbar
 {
 	position:relative;
