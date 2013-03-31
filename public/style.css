@@ -101,6 +101,13 @@ a:visited {color:#000000;}
 	font-size:14px;
 }
 
+.chat-text
+{
+	padding-top:10px;
+	padding-bottom:10px;
+	font-family:monospace;
+}
+
 .toolbar
 {
 	position:relative;

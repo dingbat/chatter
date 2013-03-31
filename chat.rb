@@ -38,7 +38,7 @@ post '/chat' do
   msg = params[:msg]
   
   chats[name] ||= ""
-  chats[name] += "<b>"+user+"</b>: "+msg+"\n"
+  chats[name] += "<b>"+user+"</b>: "+msg+"<br>"
   
   payload = "event: chat-#{name}\ndata: #{user}\ndata: #{msg}\n\n"
   connections.each { |out| out << payload }

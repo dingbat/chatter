@@ -16,7 +16,7 @@ if (e.eventPhase == EventSource.CLOSED) {
 
 function chatCode(name)
 {
-var a = "<div class='chatbox'><pre id='chat-"+name+"'></pre> \
+var a = "<div class='chatbox'><div class='chat-text' id='chat-"+name+"'></div> \
 <form action='javascript:;' id='form-"+name+"'><input size='40' id='msg-"+name+"' autocomplete='off' placeholder='type message here...' /></form></div>";
 return a;
 }
@@ -186,7 +186,7 @@ source.addEventListener('chat-'+name, function(e)
 	{
 		disp = "<span style='color:blue'>"+disp+"</span>";
 	}
-  $('#chat-'+name).append(disp+msg+"\n");
+  $('#chat-'+name).append(disp+msg+"<br>");
 
 }, false);
 
@@ -203,7 +203,7 @@ $('#form-'+name).on('submit',function(e) {
   $.post('/chat', {name: name, msg: msgBox.val(), user: user});
   msgBox.val('');
   msgBox.focus();
-	var scrolly = msgBox.parent(".content");
+	var scrolly = msgBox.parents(".content");
 	scrolly.scrollTop(scrolly[0].scrollHeight);
   e.preventDefault();
 });
