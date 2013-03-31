@@ -3,6 +3,7 @@
 require 'sinatra'
 set :server, 'thin'
 connections = []
+chats = {}
 
 get '/' do
   halt erb(:login) unless params[:user]
@@ -16,8 +17,19 @@ get '/stream', :provides => 'text/event-stream' do
   end
 end
 
+get '/chat' do
+  chats[params[:name]]
+end
+
 post '/chat' do
-  payload = "event: chat-#{params[:name]}\ndata: #{params[:user]}\ndata: #{params[:msg]}\n\n"
+  name = params[:name]
+  user = params[:user]
+  msg = params[:msg]
+  
+  chats[name] ||= ""
+  chats[name] += "<b>"+user+"</b>: "+msg+"\n"
+  
+  payload = "event: chat-#{name}\ndata: #{user}\ndata: #{msg}\n\n"
   connections.each { |out| out << payload }
   204 # response without entity body
 end
@@ -37,10 +49,13 @@ __END__
 @@ layout
 <html>
   <head>
-    <title>Super Simple Chat with Sinatra</title>
+    <title>Chatter</title>
     <meta charset="utf-8" />
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-  </head>
+    <script src="jquery-1.9.1.js"></script>
+    <script src="jquery-ui.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
   <body><%= yield %></body>
 </html>
 
@@ -52,27 +67,26 @@ __END__
 </form>
 
 @@ chat
-<div id="rooms"></div>
 
-<br>
-<br>
-<br>
+<section class="sidebar">
+  <div class="inset">
+    <h1>chatter</h1>
+    <br>
 
-<div id="pads"></div>
-<br>
-<br>
-<br>
+  <a href="#" onclick="makeBox('room')">new room</a>
+  <br>
+  <a href="#" onclick="makeBox('pad')">new pad</a>
+  <br>
+  <a href="#" onclick="makeBox('board')">new board</a>
+  </div>
+</section>
 
-<div id="boards"></div>
-
-<br>
-<br>
-<br>
-New Room: <input id="rname" /><button onclick="newRoom($('#rname').val())">go</button>
-<br>
-New Pad: <input id="pname" /><button onclick="newPad($('#pname').val())">go</button>
-<br>
-New Board: <input id="bname" /><button onclick="newWhiteboard($('#bname').val())">go</button>
+<section class="main">
+  <div class="inset">
+    <div id="windows">
+    </div>
+  </div>
+</section>
 
 <script>
   padTimeouts = {};
@@ -80,7 +94,15 @@ New Board: <input id="bname" /><button onclick="newWhiteboard($('#bname').val())
   boards = {};
   isDragging = false;
   
-  source = new EventSource('/stream?str='+name);
+  source = new EventSource('/stream');
+  
+  source.addEventListener('error', function(e) {
+    console.log("error == "+e);
+    if (e.eventPhase == EventSource.CLOSED) {
+      // Connection was closed.
+      console.log("closed.");
+    }
+  }, false);
   
   function getPosition(e) {
 
@@ -106,14 +128,30 @@ New Board: <input id="bname" /><button onclick="newWhiteboard($('#bname').val())
 
   function newRoom(name)
   {
-    $('#rooms').append("<pre id='chat-"+name+"'></pre><form id='form-"+name+"'><input id='msg-"+name+"' placeholder='type message here...' /></form>");
+    var a = "<div id='window-"+name+"' class='window'> \
+      <div class='titlebar'><div class='title'>chatroom</div><div class='kill'>x</div></div> \
+      <div class='content'> \
+        <pre id='chat-"+name+"' class='chatbox'></pre> \
+        <form id='form-"+name+"'><input id='msg-"+name+"' placeholder='type message here...' /></form> \
+      </div> \
+    </div> \
+    ";
     
+    $('#windows').append(a);
+    
+    $('#window-'+name).draggable();
+    $('#window-'+name).resizable();
+    
+    console.log("add listener for chat-"+name);
     source.addEventListener('chat-'+name, function(e) 
     {
       var dat = e.data.split("\n"); 
       var user = dat[0];
       var msg = dat[1];
-      $('#chat-'+name).append("\n" + "<b>" + user + "</b>: "+msg);
+      $('#chat-'+name).append("<b>" + user + "</b>: "+msg+"\n");
+
+      console.log("being chatted at by "+user);
+
     }, false);
     
     $('#form-'+name).on('submit',function(e) {
@@ -123,6 +161,11 @@ New Board: <input id="bname" /><button onclick="newWhiteboard($('#bname').val())
       msgBox.val('');
       msgBox.focus();
       e.preventDefault();
+    });
+    
+    $.get('/chat?name='+name, function(data)
+    {
+      $('#chat-'+name).html(data);
     });
   }
   

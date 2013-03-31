@@ -1,0 +1,66 @@
+body
+{
+  font-family:Arial;
+  margin: 0;
+}
+
+section.sidebar
+{
+  font-size: 16px;
+  width: 210px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: #F1F1F1;
+}
+
+.inset
+{
+  margin:10px;
+}
+
+.window {
+  background: #FCFCFC;
+  width: 350px;
+  margin: 0px;
+  border: 1px solid black;
+}
+
+.window .titlebar
+{
+	background-color:#F3F3F3;
+  width: 100%;
+  margin: -1px;
+  height: 28px;
+  border: 1px solid black;
+}
+
+.window .titlebar .title
+{
+  font-size: 16px;
+  font-weight: bold;
+  float:left;
+  padding:5px;
+}
+
+.window .titlebar .kill
+{
+  float:right;
+  padding:5px;
+  padding-right:10px;
+}
+
+.window .content
+{
+  padding:10px;
+}
+
+.chatbox
+{
+	overflow: scroll;
+}
+
+section.main
+{
+	margin-left: 210px; 
+}
