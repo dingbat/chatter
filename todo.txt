@@ -1,0 +1,4 @@
+- duplicate rooms (same names).
+- overflow on chat
+
+- server
