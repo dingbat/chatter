@@ -8,11 +8,15 @@ section.sidebar
 {
   font-size: 16px;
   width: 210px;
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   background-color: #F1F1F1;
+  border-right: 1px solid black;
+
 }
+
+a:visited {color:#000000;}
 
 .inset
 {
