@@ -24,7 +24,6 @@ get '/chat' do
 end
 
 get '/board' do
-  puts "sending "+ (boards[params[:name]] || "")
   boards[params[:name]] || ""
 end
 
@@ -59,8 +58,6 @@ post '/board' do
   name = params[:name]
   msg = params[:msg]
   
-  puts "adding #{msg} to baords[#{name}]"
-  
   if msg
     if msg == "clear"
       boards[name] = ""
@@ -69,9 +66,7 @@ post '/board' do
       boards[name] += msg
     end
   end
-  
- # puts "boards[#{name}] = #{boards[name]}"
-  
+    
   connections.each { |out| out << "event: board-#{name}\ndata: #{msg}\n\n" }
   204 # response without entity body
 end

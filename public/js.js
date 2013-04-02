@@ -123,7 +123,7 @@ function joinWindow(type, form)
 	{
 		wind.find('.newcontent').append("<div class='dupealert'>"+name+" "+type+" is already open.</div>");
 	}
-	else
+	else if (name.length > 0)
 	{
 		newWindow(type, wind, name);
 	}
